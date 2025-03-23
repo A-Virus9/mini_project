@@ -1,6 +1,5 @@
 import pandas as pd
 import re
-import numpy as np
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.linear_model import LogisticRegression
 from sklearn.naive_bayes import MultinomialNB
@@ -8,7 +7,6 @@ from sklearn.linear_model import SGDClassifier
 from sklearn.model_selection import train_test_split, cross_val_score
 from sklearn.metrics import accuracy_score, confusion_matrix, classification_report
 from flask import Flask, request, render_template, session
-import json
 
 app = Flask(__name__)
 app.secret_key = 'your_secret_key_here'
