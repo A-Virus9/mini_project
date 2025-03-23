@@ -1,0 +1,164 @@
+<!-- <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fake News Detector</title>
+    <link rel="stylesheet" href="../static/styles/styles.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Fake News Detector</h1>
+        <form method="POST">
+            <textarea name="news_text" rows="10" cols="50" placeholder="Enter news text here..."></textarea><br><br>
+            <input type="submit" value="Check">
+        </form>
+        {% if result %}
+            {% if result == 'fake' %}
+                <h2 style="color: rgb(255, 83, 83);">This news is fake</h2>
+            {% else %}
+                <h2 style="color: #27ae60;">This news is real</h2>
+            {% endif %}
+        {% endif %}
+    </div>
+</body>
+</html> -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fake News Detector</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="stylesheet" href="../static/styles/styles.css">
+</head>
+<body>
+    <div class="container">
+        <h1 class="main-title"><i class="fas fa-newspaper"></i> Fake News Detection System</h1>
+        
+        <section class="input-section">
+            <h2><i class="fas fa-edit"></i> Analyze News Article</h2><br>
+            <form method="POST">
+                <div class="form-group">
+                    <textarea name="news_text" placeholder="Paste news article here (minimum 50 characters)..."></textarea>
+                    {% if error %}
+                        <p class="error-message"><i class="fas fa-exclamation-circle"></i> {{ error }}</p>
+                    {% endif %}
+                </div><br>
+                <button type="submit" class="analyze-btn">
+                    <i class="fas fa-search"></i> Analyze Article
+                </button>
+            </form>
+        </section>
+
+        <br>
+
+        {% if prediction %}
+        <section class="results-section">
+            <h2><i class="fas fa-poll"></i> Analysis Results</h2>
+            <div class="result-card {{ 'fake' if prediction.result == 'fake' else 'real' }}">
+                <div class="result-header">
+                    <h3>Prediction: {{ prediction.result|upper }}</h3>
+                    <span class="confidence">{{ prediction.confidence }}% Confidence</span>
+                </div>
+                <div class="result-details">
+                    <div class="detail-box">
+                        <h4>Original Text Sample</h4>
+                        <p>{{ prediction.text }}</p>
+                    </div>
+                    <div class="detail-box">
+                        <h4>Processed Text Sample</h4>
+                        <p>{{ prediction.processed_text }}</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+        {% endif %}
+
+        <br>
+
+        {% if history %}
+        <section class="history-section">
+            <h2><i class="fas fa-history"></i> Analysis History</h2>
+            <div class="history-grid">
+                {% for item in history %}
+                <div class="history-card {{ 'fake' if item.result == 'fake' else 'real' }}">
+                    <span class="result-label">{{ item.result|upper }}</span>
+                    <p class="confidence">{{ item.confidence }}%</p>
+                    <p class="text-sample">{{ item.text }}</p>
+                </div>
+                {% endfor %}
+            </div>
+        </section>
+        {% endif %}
+
+        <br>
+
+        <section class="dataset-section">
+            <h2><i class="fas fa-database"></i> Dataset Statistics</h2><br>
+            <div class="stats-grid">
+                <div class="stat-box">
+                    <h4>Total Samples</h4>
+                    <p>{{ dataset_report.original_samples }}</p>
+                </div>
+                <div class="stat-box">
+                    <h4>Clean Samples</h4>
+                    <p>{{ dataset_report.cleaned_samples }}</p>
+                </div>
+                <div class="stat-box">
+                    <h4>Fake News %</h4>
+                    <p>{{ "%.2f"|format(dataset_report.fake_percentage) }}%</p>
+                </div>
+                <div class="stat-box">
+                    <h4>Avg Words/Article</h4>
+                    <p>{{ "%.1f"|format(dataset_report.avg_word_count) }}</p>
+                </div>
+            </div>
+        </section>
+
+        <br>
+
+        <section class="model-section">
+            <h2><i class="fas fa-chart-line"></i> Model Performance</h2><br>
+            <div class="model-tabs">
+                {% for model_name, report in model_reports.items() %}
+                <div class="model-card">
+                    <h3>{{ model_name }}</h3>
+                    <div class="model-metrics">
+                        <div class="metric">
+                            <span class="metric-label">Accuracy</span>
+                            <span class="metric-value">{{ "%.2f"|format(report.accuracy * 100) }}%</span>
+                        </div>
+                        <div class="metric">
+                            <span class="metric-label">CV Score</span>
+                            <span class="metric-value">{{ "%.2f"|format(report.cv_mean * 100) }}%</span>
+                        </div>
+                    </div>
+                    <div class="detailed-report" id="{{ model_name }}-details">
+                        
+                        <h4>Confusion Matrix</h4>
+                        <div class="confusion-matrix">
+                            {% for row in report.confusion_matrix %}
+                            <div class="matrix-row">
+                                {% for cell in row %}
+                                <span class="matrix-cell">{{ cell }}</span>
+                                {% endfor %}
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </section>
+    </div>
+
+    <script>
+        function toggleDetails(modelName) {
+            const details = document.getElementById(`${modelName}-details`);
+            details.classList.toggle('show');
+        }
+    </script>
+</body>
+</html>
